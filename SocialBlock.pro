@@ -12,6 +12,12 @@ TARGET = SocialBlock
 TEMPLATE = app
 
 
-SOURCES += src/main.cpp
+SOURCES += src/main.cpp \
+    src/blockinterval.cpp \
+    src/profile.cpp \
+    src/manager.cpp
 
-HEADERS  +=
+HEADERS  += \
+    src/blockinterval.h \
+    src/profile.h \
+    src/manager.h
