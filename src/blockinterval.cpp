@@ -21,11 +21,11 @@ BlockInterval::BlockInterval() :
 }
 
 void BlockInterval::setBeginTime(int hh, int mm) {
-    timeBegin.setHMS(hh, mm);
+    timeBegin.setHMS(hh, mm, 0);
 }
 
 void BlockInterval::setEndTime(int hh, int mm) {
-    timeEnd.setHMS(hh, mm);
+    timeEnd.setHMS(hh, mm, 0);
 }
 
 bool BlockInterval::isIncludeTime(QTime &time) {
@@ -36,3 +36,8 @@ bool BlockInterval::isIncludeTime(QTime &time) {
         return false;
     return true;
 }
+
+void BlockInterval::setNewAdresses(QStringList &newAddr) {
+    adresses = newAddr;
+}
+

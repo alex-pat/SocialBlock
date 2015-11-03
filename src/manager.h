@@ -11,7 +11,7 @@ class Manager
 public:
     Manager();
     void addProfile ( Profile* newProfile );
-    void deteleProfile ( int index );
+    void deleteProfile ( int index );
     void setCurrentProfile (int index );
     void startBlock ();
     void stopBlock();
