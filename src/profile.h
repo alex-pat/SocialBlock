@@ -7,11 +7,13 @@
 class Profile
 {
     QList < BlockInterval* > week[7];
+    QString name;
 public:
     Profile();
     void addInterval (int day, BlockInterval* newInterv);
-    // void deleteInterval (int day, int index);
-    // дописать
+    void deleteInterval (int day, int index);
+    void changeInterval (int day, int index, BlockInterval* );
+
 };
 
 #endif // PROFILE_H

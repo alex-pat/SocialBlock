@@ -1,6 +1,7 @@
 #include "profile.h"
 
-Profile::Profile()
+Profile::Profile() :
+    name ("Untitled")
 {
 
 }
