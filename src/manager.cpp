@@ -3,7 +3,7 @@
 #include <QMessageBox>
 
 Manager::Manager() :
-    currentProfile (-1)
+    currentProfile (0)
 { }
 
 void Manager::addProfile(Profile *newProfile) {
@@ -27,12 +27,21 @@ void Manager::startBlock() {
     if ( profiles.isEmpty() )
         return;
     QFile hosts ("/etc/hosts");
-    if ( hosts.open( QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append) == false ) {
+    if ( hosts.open( QIODevice::ReadWrite | QIODevice::Text | QIODevice::Append) == false ) {
         cerr << "Cannot open /etc/hosts" << endl;
         return;
     }
+    QByteArray rawHosts = hosts.readAll();
+    QString strHosts = rawHosts.toStdString();
+    QStringList listHosts = strHosts.split('\n');
 
-//    for (int i = 0; i < profSize; i++) {
-//        profiles [i]->getBlockingStrings()
-//    }
+
+    QStringListIterator iter = listHosts.begin(),
+                        end = listHosts.end();
+
+
+
+    while ( iter.hasNext() ) {
+
+    }
 }
