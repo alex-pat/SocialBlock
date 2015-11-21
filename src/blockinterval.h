@@ -7,13 +7,14 @@ class BlockInterval
 {
     QTime timeBegin;
     QTime timeEnd;
-    QStringList adresses;
+    QStringList addresses;
 public:
     BlockInterval();
     void setBeginTime (int hh, int mm);
     void setEndTime (int hh, int mm);
     void setNewAdresses (QStringList &newAddr);
-    bool isIncludeTime ( QTime& time );
+    bool isIncludeTime ( );
+    QStringList& getAddresses();
 };
 
 #endif // BLOCKINTERVAL_H

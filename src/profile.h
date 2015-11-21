@@ -13,8 +13,8 @@ public:
     void addInterval (int day, BlockInterval* newInterv);
     void deleteInterval (int day, int index);
     void changeInterval (int day, int index, BlockInterval* );
-    void addToHosts (QString& strHosts );
-    void removeFromHosts (QString& strHosts );
+    void writeToHosts ( );
+    void removeFromHosts ( );
 };
 
 #endif // PROFILE_H

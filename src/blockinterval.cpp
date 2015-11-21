@@ -4,7 +4,7 @@ BlockInterval::BlockInterval() :
     timeBegin (  8, 0),
     timeEnd   ( 12, 0)
 {
-    adresses << "vk.com"
+    addresses << "vk.com"
              << "facebook.com"
              << "twitter.com"
              << "instagram.com"
@@ -28,7 +28,7 @@ void BlockInterval::setEndTime(int hh, int mm) {
     timeEnd.setHMS(hh, mm, 0);
 }
 
-bool BlockInterval::isIncludeTime(QTime &time) {
+bool BlockInterval::isIncludeTime( ) {
     QTime current = QTime::currentTime();
     if ( current < timeBegin )
         return false;
@@ -38,6 +38,9 @@ bool BlockInterval::isIncludeTime(QTime &time) {
 }
 
 void BlockInterval::setNewAdresses(QStringList &newAddr) {
-    adresses = newAddr;
+    addresses = newAddr;
 }
 
+QStiringList& BlockInterval::getAddresses () {
+    return addresses;
+}

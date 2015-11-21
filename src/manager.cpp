@@ -1,6 +1,4 @@
 #include "manager.h"
-#include <QFile>
-#include <QMessageBox>
 
 Manager::Manager() :
     currentProfile (0)
@@ -26,22 +24,13 @@ void Manager::setCurrentProfile(int index) {
 void Manager::startBlock() {
     if ( profiles.isEmpty() )
         return;
-    QFile hosts ("/etc/hosts");
-    if ( hosts.open( QIODevice::ReadWrite | QIODevice::Text | QIODevice::Append) == false ) {
-        cerr << "Cannot open /etc/hosts" << endl;
+    profiles[currentProfile]->removeFromHosts();
+    profiles[currentProfile]->writeToHosts();
+
+}
+
+void Manager::stopBlock() {
+    if ( profiles.isEmpty() )
         return;
-    }
-    QByteArray rawHosts = hosts.readAll();
-    QString strHosts = rawHosts.toStdString();
-    QStringList listHosts = strHosts.split('\n');
-
-
-    QStringListIterator iter = listHosts.begin(),
-                        end = listHosts.end();
-
-
-
-    while ( iter.hasNext() ) {
-
-    }
+    profiles[currentProfile]->removeFromHosts();
 }
