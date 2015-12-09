@@ -15,6 +15,7 @@ public:
     void setNewAdresses (QStringList &newAddr);
     bool isIncludeTime ( );
     QStringList& getAddresses();
+    BlockInterval& operator = (BlockInterval& second);
 };
 
 #endif // BLOCKINTERVAL_H

@@ -1,6 +1,7 @@
 import QtQuick 2.4
 import Material 0.1
 import Material.ListItems 0.1 as ListItem
+import SocialBlock.connector 1.0
 
 ApplicationWindow {
     id: demo
@@ -10,6 +11,10 @@ ApplicationWindow {
     // Necessary when loading the window from C++
     visible: true
 
+    SBConnector {
+        id: manager
+    }
+
     theme {
         primaryColor: Palette.colors["blue"]["500"]
         primaryDarkColor: Palette.colors["blue"]["700"]
@@ -17,24 +22,30 @@ ApplicationWindow {
         tabHighlightColor: "white"
     }
     // TODO: ADD PROFILES LOADING
-    property var profiles: [
-            "Easy", "Mid", "Hard", "Stakhanov"
+    property var days: [
+            "Monday", "Tuesday", "Wednesday", "Thursday",
+            "Friday", "Saturday", "Sunday"
     ]
 
-    property var settings: [
+    property var basicComponents: [
             "Button", "CheckBox", "Progress Bar", "Radio Button",
             "Slider", "Switch", "TextField"
     ]
 
-    property var about: [
+    property var compoundComponents: [
             "Bottom Sheet", "Dialog", "Forms", "List Items", "Page Stack", "Time Picker", "Date Picker"
     ]
 
-    property var sections: [ profiles, settings, about ]
+    Repeater {
+        id: weekdays
+        model: manager.getProfilesCount()
+    }
 
-    property var sectionTitles: [ "Profiles", "Settings", "About" ]
+    property var sections: [ days, basicComponents, compoundComponents ]
 
-    property string selectedComponent: profiles[0]
+    property var sectionTitles: manager.getProfileNames()
+
+    property string selectedComponent: styles[0]
 
     initialPage: TabbedPage {
         id: page
@@ -197,6 +208,9 @@ ApplicationWindow {
                     }
                 }
             }
+        }
+        onRejected: {
+             // TODO set default colors again but we currently don't know what that is
         }
     }
 

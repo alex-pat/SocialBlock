@@ -17,9 +17,13 @@ void Profile::deleteInterval(int day, int index) {
     week[day].removeAt(index);
 }
 
-void Profile::changeInterval(int day, int index, BlockInterval *newInterv) {
+void Profile::changeInterval(int day, int index, BlockInterval &newInterv) {
     delete week[day].at(index);
-    week[day].at(index) = newInterv;
+    *( week[day].at(index) ) = newInterv;
+}
+
+void Profile::setName(QString newName) {
+    name = newName;
 }
 
 void Profile::writeToHosts() {
@@ -42,11 +46,11 @@ void Profile::writeToHosts() {
     if ( ! intervIter.hasNext() )
         return;
 
-    QListIterator <QString> site (intervIter.peekPrevious());
+    QListIterator <QString> site (intervIter.peekPrevious()->getAddresses());
     while ( site.hasNext() ) {
-        std::string str= "127.0.0.1\t" + site.peekNext() + "\t# Blocked by SocialBlock\n"
+        QString str= "127.0.0.1\t" + site.peekNext() + "\t# Blocked by SocialBlock\n"
                   "127.0.0.1\twww." + site.next() + "\t# Blocked by SocialBlock\n";
-        hosts.write( str );
+        hosts.write( str.toStdString().c_str() );
     }
 
     hosts.close();
@@ -64,7 +68,7 @@ void Profile::removeFromHosts() {
     if ( ! intervIter.hasNext() )
         return;
 
-    QListIterator <QString> sites (intervIter.peekPrevious()->getAddresses() );
+    QStringListIterator sites (intervIter.peekPrevious()->getAddresses() );
 
     QFile hosts ("/etc/hosts");
     if ( hosts.open( QIODevice::ReadOnly |
@@ -76,15 +80,18 @@ void Profile::removeFromHosts() {
     QStringList listHosts = QString( hosts.readAll().toStdString().c_str() ).split('\n');
     hosts.close();
 
-    QStringList::iterator iterHosts, hostsSize = listHosts.size();
+    QMutableStringListIterator iterHosts(listHosts);
 
-    for ( iterHosts = 0; iterHosts < hostsSize; ++iterHosts) {
+    while ( iterHosts.hasNext() ) {
+        iterHosts.next();
         sites.toFront();
         while ( sites.hasNext() )
-            if ( listHosts.at(iterHosts).find( sites.next() ) != std::string::npos ) {
-                listHosts.removeAt( iterHosts-- );
+            if ( iterHosts.peekPrevious().contains(sites.peekNext()) ) {
+                iterHosts.remove();
                 break;
             }
+        if ( !sites.hasNext() )
+            iterHosts.previous();
     }
 
     if ( hosts.open( QIODevice::WriteOnly |
@@ -95,4 +102,8 @@ void Profile::removeFromHosts() {
 
     hosts.write ( listHosts.join('\n').toStdString().c_str() );
 
+}
+
+QString Profile::getName() const {
+    return name;
 }

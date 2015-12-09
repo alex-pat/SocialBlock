@@ -1,8 +1,28 @@
 #include "manager.h"
 
-Manager::Manager() :
+Manager::Manager( QObject* parent ) :
+    QObject (parent),
     currentProfile (0)
 { }
+
+//void Manager::setProfileNames() {
+//    QStringList resultList;
+//    int size = profiles.size();
+//    for (int i = 0; i < size; i++)
+//        resultList << profiles[i]->getName();
+//    profileNames.setStringList(resultList);
+//}
+
+//QStringListModel Manager::getDays() {
+//    QStringList days;
+//    days << "Monday"
+//         << "Tuesday"
+//         << "Wednesday"
+//         << "Thursday"
+//         << "Friday"
+//         << "Saturday"
+//         << "Sunday";
+//}
 
 void Manager::addProfile(Profile *newProfile) {
     profiles.push_back( newProfile );
@@ -10,11 +30,7 @@ void Manager::addProfile(Profile *newProfile) {
 
 void Manager::deleteProfile(int index) {
     delete profiles[ index ];
-    QVectorIterator < Profile* > iter;
-    iter = profiles.begin();
-    for ( int i = 0; i < index; i++ )
-        iter++;
-    cards.erase( iter );
+    profiles.remove(index);
 }
 
 void Manager::setCurrentProfile(int index) {

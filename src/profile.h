@@ -12,9 +12,11 @@ public:
     Profile();
     void addInterval (int day, BlockInterval* newInterv);
     void deleteInterval (int day, int index);
-    void changeInterval (int day, int index, BlockInterval* );
+    void changeInterval (int day, int index, BlockInterval& newInterv );
     void writeToHosts ( );
     void removeFromHosts ( );
+    void setName ( QString newName );
+    QString getName() const;
 };
 
 #endif // PROFILE_H

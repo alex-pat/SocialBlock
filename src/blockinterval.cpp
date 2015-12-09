@@ -41,6 +41,12 @@ void BlockInterval::setNewAdresses(QStringList &newAddr) {
     addresses = newAddr;
 }
 
-QStiringList& BlockInterval::getAddresses () {
+QStringList& BlockInterval::getAddresses () {
     return addresses;
+}
+
+BlockInterval& BlockInterval::operator = (BlockInterval& second) {
+    timeBegin = second.timeBegin;
+    timeEnd = second.timeEnd;
+    addresses = second.addresses;
 }

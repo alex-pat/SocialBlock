@@ -4,9 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core \
+    gui \
+    quick \
+    qml \
+    widgets \
+    quickwidgets
 
 TARGET = SocialBlock
 TEMPLATE = app
@@ -15,9 +18,14 @@ TEMPLATE = app
 SOURCES += src/main.cpp \
     src/blockinterval.cpp \
     src/profile.cpp \
-    src/manager.cpp
+    src/manager.cpp \
+    src/connector.cpp
 
 HEADERS  += \
     src/blockinterval.h \
     src/profile.h \
-    src/manager.h
+    src/manager.h \
+    src/connector.h
+
+RESOURCES += \
+    res/resources.qrc
