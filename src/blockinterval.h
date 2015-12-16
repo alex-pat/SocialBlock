@@ -2,6 +2,7 @@
 #define BLOCKINTERVAL_H
 
 #include <QTime>
+#include <QDataStream>
 
 class BlockInterval
 {
@@ -16,6 +17,10 @@ public:
     bool isIncludeTime ( );
     QStringList& getAddresses();
     BlockInterval& operator = (BlockInterval& second);
+
+    friend QDataStream& operator<< (QDataStream& stream, BlockInterval& interv);
+    friend QDataStream& operator>> (QDataStream& stream, BlockInterval* interv);
+
 };
 
 #endif // BLOCKINTERVAL_H

@@ -41,11 +41,11 @@ ApplicationWindow {
         model: manager.getProfilesCount()
     }
 
-    property var sections: [ days, basicComponents, compoundComponents ]
+    property var sections: [ days, days, days, days /*basicComponents, compoundComponents*/ ]
 
     property var sectionTitles: manager.getProfileNames()
 
-    property string selectedComponent: styles[0]
+    property string selectedComponent: styles[ manager.getCurrentProfileNumber() ]
 
     initialPage: TabbedPage {
         id: page

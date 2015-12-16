@@ -50,3 +50,25 @@ BlockInterval& BlockInterval::operator = (BlockInterval& second) {
     timeEnd = second.timeEnd;
     addresses = second.addresses;
 }
+
+QDataStream& operator<< (QDataStream& stream, BlockInterval& interv) {
+    stream << interv.timeBegin
+           << interv.timeEnd;
+    int addrSize = interv.addresses.size();
+    stream << addrSize;
+    for (int i = 0; i < addrSize; i++)
+        stream << interv.addresses[i];
+    return stream;
+}
+
+QDataStream& operator>> (QDataStream& stream, BlockInterval* interv) {
+    stream >> interv->timeBegin
+           >> interv->timeEnd;
+    int addrSize;
+    stream >> addrSize;
+    for (int i = 0; i < addrSize; i++) {
+        QString tempString;
+        stream >> tempString;
+        interv->addresses.push_back(tempString);
+    }
+}

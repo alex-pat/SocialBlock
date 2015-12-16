@@ -15,6 +15,7 @@ public:
 
     Q_INVOKABLE QStringList getProfileNames();
     Q_INVOKABLE int getProfilesCount();
+    Q_INVOKABLE int getCurrentProfileNumber();
 
 signals:
 

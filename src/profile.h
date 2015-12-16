@@ -17,6 +17,9 @@ public:
     void removeFromHosts ( );
     void setName ( QString newName );
     QString getName() const;
+
+    friend QDataStream& operator<< (QDataStream& stream, Profile& prof);
+    friend QDataStream& operator>> (QDataStream& stream, Profile* prof);
 };
 
 #endif // PROFILE_H

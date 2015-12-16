@@ -32,7 +32,7 @@ void Profile::writeToHosts() {
                      QIODevice::Text |
                      QIODevice::Append ) == false ) {
         std::cerr << "Cannot open /etc/hosts" << std::endl;
-        return;
+        exit(1);
     }
 
     int today = QDate::currentDate().dayOfWeek() - 1;
@@ -106,4 +106,26 @@ void Profile::removeFromHosts() {
 
 QString Profile::getName() const {
     return name;
+}
+
+QDataStream& operator<< (QDataStream& stream, Profile& prof) {
+    stream << prof.name;
+    for (int i = 0; i < 7; i++) {
+        int intervCount = prof.week[i].size();
+        stream << intervCount;
+        for (int j = 0; j < intervCount; j++)
+            stream << *(prof.week[i][j]);
+    }
+    return stream;
+}
+
+QDataStream& operator>> (QDataStream& stream, Profile* prof) {
+    stream >> prof->name;
+    for (int i = 0; i < 7; i++) {
+        int intervCount;
+        stream >> intervCount;
+        for (int j = 0; j < intervCount; j++) {
+            stream >> prof->week[i][j];
+        }
+    }
 }

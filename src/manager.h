@@ -25,6 +25,8 @@ public:
     void setCurrentProfile (int index );
     void startBlock ();
     void stopBlock();
+    void saveData();
+    void loadData();
 
 signals:
     void profileNamesChanged(QStringList);

@@ -1,4 +1,6 @@
 #include "manager.h"
+#include <QFile>
+#include <iostream>
 
 Manager::Manager( QObject* parent ) :
     QObject (parent),
@@ -49,4 +51,35 @@ void Manager::stopBlock() {
     if ( profiles.isEmpty() )
         return;
     profiles[currentProfile]->removeFromHosts();
+}
+
+void Manager::saveData() {
+    QFile settings ("sbsettings");
+    if ( settings.open ( QIODevice::WriteOnly ) == false ) {
+        std::cerr << "Cannot open settings" << std::endl;
+        exit(1);
+    }
+    QDataStream stngs (&settings);
+    int size = profiles.size();
+    stngs << size
+          << currentProfile;
+    for (int i = 0; i < size; i++)
+        stngs << *(profiles[i]);
+}
+
+void Manager::loadData() {
+    QFile settings ("sbsettings");
+    if ( settings.open ( QIODevice::ReadOnly ) == false ) {
+        std::cerr << "Cannot open settings" << std::endl;
+        exit(1);
+    }
+    QDataStream stngs (&settings);
+    int size;
+    stngs >> size
+          >> currentProfile;
+    for (int i = 0; i < size; i++) {
+        Profile* prof = new Profile;
+        stngs >> prof;
+        profiles.push_back( prof );
+    }
 }
