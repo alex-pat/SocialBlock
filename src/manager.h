@@ -27,7 +27,9 @@ public:
     void stopBlock();
     void saveData();
     void loadData();
-    int getCurrentNumber() const;
+    int getCurrentNumber () const;
+    void writeDefaults ();
+    bool isBlockedNow () const;
 
 //signals:
 //    void profileNamesChanged(QStringList);

@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSystemTrayIcon>
 #include <QMenu>
+#include <QTimer>
 #include "manager.h"
 
 class Connector : public QObject
@@ -11,11 +12,15 @@ class Connector : public QObject
     Q_OBJECT
 
     Manager* manag;
-    bool blocked;
+    bool isblocked;
+    bool istracked;
     QSystemTrayIcon* trayIcon;
     QMenu* iconMenu;
+    QTimer* timer;
 
-    Q_PROPERTY(bool blocked READ isBlocked NOTIFY blockedChanged)
+    Q_PROPERTY(bool isblocked READ isBlocked NOTIFY blockedChanged)
+    Q_PROPERTY(bool istracked READ isTracked NOTIFY istrackedChanged)
+
 public:
     Connector( QObject *parent = 0);
     ~Connector();
@@ -25,19 +30,22 @@ public:
     Q_INVOKABLE int getCurrentProfileNumber();
     Q_INVOKABLE QStringList getTimesList( int profile, int day);
     Q_INVOKABLE QStringList getSitesList (int profile, int day);
-    Q_INVOKABLE void deleteInterval( int profile, int day, int interv);
-    Q_INVOKABLE void save();
 
-    bool isBlocked();
-
+    bool isBlocked() const;
+    bool isTracked() const;
 signals:
-    //void settingsLoaded();
     void exitApplication();
     void openApplication();
     void blockedChanged();
+    void istrackedChanged();
 
 public slots:
-    void exitTriggered();
+    void exitTriggered ();
+    void timeout ();
+    void save ();
+    void deleteInterval( int profile, int day, int interv);
+    void trackTriggered();
+    void setCurrentProfileNumber( int profile );
 };
 
 #endif // CONNECTOR_H

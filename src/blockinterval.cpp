@@ -67,6 +67,7 @@ QDataStream& operator>> (QDataStream& stream, BlockInterval* interv) {
            >> interv->timeEnd;
     int addrSize;
     stream >> addrSize;
+    interv->addresses.clear();
     for (int i = 0; i < addrSize; i++) {
         QString tempString;
         stream >> tempString;

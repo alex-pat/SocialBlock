@@ -7,25 +7,6 @@ Manager::Manager( /*QObject* parent*/ ) :
     currentProfile (0)
 { }
 
-//void Manager::setProfileNames() {
-//    QStringList resultList;
-//    int size = profiles.size();
-//    for (int i = 0; i < size; i++)
-//        resultList << profiles[i]->getName();
-//    profileNames.setStringList(resultList);
-//}
-
-//QStringListModel Manager::getDays() {
-//    QStringList days;
-//    days << "Monday"
-//         << "Tuesday"
-//         << "Wednesday"
-//         << "Thursday"
-//         << "Friday"
-//         << "Saturday"
-//         << "Sunday";
-//}
-
 void Manager::addProfile(Profile *newProfile) {
     profiles.push_back( newProfile );
 }
@@ -69,6 +50,10 @@ void Manager::saveData() {
 
 void Manager::loadData() {
     QFile settings ("sbsettings");
+    if ( settings.exists() == false ) {
+        writeDefaults();
+        return;
+    }
     if ( settings.open ( QIODevice::ReadOnly ) == false ) {
         std::cerr << "Cannot open settings" << std::endl;
         exit(1);
@@ -86,4 +71,65 @@ void Manager::loadData() {
 
 int Manager::getCurrentNumber() const {
     return currentProfile;
+}
+
+void Manager::writeDefaults() {
+    currentProfile = 0;
+    Profile* hastilyWork = new Profile;
+    hastilyWork->setName("Hastily work");
+    for (int i = 0; i < 7; i++) {
+        BlockInterval* interv = new BlockInterval;
+        interv->setBeginTime(9,0);
+        interv->setEndTime(12,0);
+        hastilyWork->addInterval(i, interv);
+    }
+    for (int i = 0; i < 7; i++) {
+        BlockInterval* interv = new BlockInterval;
+        interv->setBeginTime(14,0);
+        interv->setEndTime(17,0);
+        hastilyWork->addInterval(i, interv);
+    }
+    profiles.push_back(hastilyWork);
+
+    Profile* passableWork = new Profile;
+    passableWork->setName("Passable work");
+    for (int i = 0; i < 7; i++) {
+        BlockInterval* interv = new BlockInterval;
+        interv->setBeginTime(8,0);
+        interv->setEndTime(12,0);
+        passableWork->addInterval(i, interv);
+    }
+    for (int i = 0; i < 7; i++) {
+        BlockInterval* interv = new BlockInterval;
+        interv->setBeginTime(13,0);
+        interv->setEndTime(17,0);
+        passableWork->addInterval(i, interv);
+    }
+    profiles.push_back(passableWork);
+
+    Profile* stakhanov = new Profile;
+    stakhanov->setName("Stakhanov");
+    for (int i = 0; i < 7; i++) {
+        BlockInterval* interv = new BlockInterval;
+        interv->setBeginTime(7,0);
+        interv->setEndTime(19,0);
+        stakhanov->addInterval(i, interv);
+    }
+    profiles.push_back(stakhanov);
+
+    Profile* sociopath = new Profile;
+    sociopath->setName("sociopath");
+    for (int i = 0; i < 7; i++) {
+        BlockInterval* interv = new BlockInterval;
+        interv->setBeginTime(0,0);
+        interv->setEndTime(23,59);
+        sociopath->addInterval(i, interv);
+    }
+    profiles.push_back(sociopath);
+
+    saveData();
+}
+
+bool Manager::isBlockedNow() const {
+    return profiles[currentProfile]->isBlockedNow();
 }

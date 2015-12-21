@@ -19,6 +19,7 @@ public:
     QString getName() const;
     QStringList getIntervals(int day) const;
     QStringList getSites (int day) const;
+    bool isBlockedNow() const;
 
     friend QDataStream& operator<< (QDataStream& stream, Profile& prof);
     friend QDataStream& operator>> (QDataStream& stream, Profile* prof);

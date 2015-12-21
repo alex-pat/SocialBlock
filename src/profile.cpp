@@ -1,18 +1,18 @@
 #include "profile.h"
 #include <QFile>
 #include <iostream>
-
+#include <QMessageBox>
 Profile::Profile() :
     name ("Untitled")
 {
-    for (int j = 0; j < 7; j++) {
-        for (int i = 0; i < 10; i++) {
-            BlockInterval *interv = new BlockInterval;
-            interv->setBeginTime(i,j);
-            week[j].push_back( interv );
-        }
+//    for (int j = 0; j < 7; j++) {
+//        for (int i = 0; i < 10; i++) {
+//            BlockInterval *interv = new BlockInterval;
+//            interv->setBeginTime(i,j);
+//            week[j].push_back( interv );
+//        }
 
-    }
+//    }
 }
 
 void Profile::addInterval(int day, BlockInterval *newInterv) {
@@ -34,7 +34,7 @@ void Profile::setName(QString newName) {
 }
 
 void Profile::writeToHosts() {
-    QFile hosts ("/etc/hosts");
+    QFile hosts ("hosts");
     if ( hosts.open( QIODevice::WriteOnly |
                      QIODevice::Text |
                      QIODevice::Append ) == false ) {
@@ -47,16 +47,16 @@ void Profile::writeToHosts() {
     //current list search
     QListIterator <BlockInterval* > intervIter (week[today]);
     while ( intervIter.hasNext() &&
-            !( intervIter.next()->isIncludeTime() ) )
-        ;
+            !( intervIter.peekNext()->isIncludeTime() ) )
+        intervIter.next();
 
     if ( ! intervIter.hasNext() )
         return;
-
     QListIterator <QString> site (intervIter.peekPrevious()->getAddresses());
     while ( site.hasNext() ) {
-        QString str= "127.0.0.1\t" + site.peekNext() + "\t# Blocked by SocialBlock\n"
-                  "127.0.0.1\twww." + site.next() + "\t# Blocked by SocialBlock\n";
+        QString str ("127.0.0.1\t" + site.peekNext() + "\t# Blocked by SocialBlock\n"
+                  "127.0.0.1\twww." + site.next() + "\t# Blocked by SocialBlock\n" );
+        QMessageBox::information(0, "sfdf",str);
         hosts.write( str.toStdString().c_str() );
     }
 
@@ -77,7 +77,7 @@ void Profile::removeFromHosts() {
 
     QStringListIterator sites (intervIter.peekPrevious()->getAddresses() );
 
-    QFile hosts ("/etc/hosts");
+    QFile hosts ("hosts");
     if ( hosts.open( QIODevice::ReadOnly |
                      QIODevice::Text ) == false ) {
         std::cerr << "Cannot open /etc/hosts" << std::endl;
@@ -132,7 +132,9 @@ QDataStream& operator>> (QDataStream& stream, Profile* prof) {
         int intervCount;
         stream >> intervCount;
         for (int j = 0; j < intervCount; j++) {
-            stream >> prof->week[i][j];
+            BlockInterval* interval = new BlockInterval;
+            stream >> interval;
+            prof->week[i].push_back(interval);
         }
     }
     return stream;
@@ -152,4 +154,12 @@ QStringList Profile::getSites(int day) const {
     while (iter.hasNext())
         result << ( iter.next()->getSitesString() );
     return result;
+}
+
+bool Profile::isBlockedNow() const {
+    QListIterator<BlockInterval*> iter (week[QDate::currentDate().dayOfWeek() - 1]);
+    while ( iter.hasNext() )
+        if ( iter.next()->isIncludeTime() )
+            return true;
+    return false;
 }

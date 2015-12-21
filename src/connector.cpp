@@ -33,7 +33,12 @@ Connector::Connector( QObject *parent ) : QObject(parent) {
     trayIcon->setIcon(QPixmap("://logo.svg"));
     trayIcon->show();
 
+    isblocked = false;
+    istracked = false;
 
+    timer = new QTimer (this);
+    connect (timer, SIGNAL(timeout()),
+             this,  SLOT (timeout()));
 }
 
 Connector::~Connector() {
@@ -66,12 +71,8 @@ QStringList Connector::getSitesList(int profile, int day) {
 }
 
 void Connector::exitTriggered() {
-    if ( blocked == false )
+    if ( isblocked == false )
         emit exitApplication();
-}
-
-bool Connector::isBlocked() {
-    return blocked;
 }
 
 void Connector::deleteInterval(int profile, int day, int interv) {
@@ -80,4 +81,38 @@ void Connector::deleteInterval(int profile, int day, int interv) {
 
 void Connector::save() {
     manag->saveData();
+}
+
+void Connector::timeout() {
+    if ( manag->isBlockedNow() == isblocked )
+        return;
+    isblocked = !isblocked;
+    if ( isblocked == true )
+        manag->startBlock();
+    else
+        manag->stopBlock();
+    emit blockedChanged();
+}
+
+void Connector::trackTriggered() {
+    if (istracked == true )
+        timer->stop();
+    else {
+        timer->start( 60*1000 );
+        timeout();
+    }
+    istracked = !istracked;
+    emit istrackedChanged();
+}
+
+bool Connector::isBlocked() const {
+    return isblocked;
+}
+
+bool Connector::isTracked() const {
+    return istracked;
+}
+
+void Connector::setCurrentProfileNumber( int profile ) {
+    manag->setCurrentProfile( profile );
 }
