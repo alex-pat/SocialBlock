@@ -1,4 +1,4 @@
 # TODO
-    - [ ] "all that should be inside"
-    - [ ] primitive GUI
-    - [ ] beautiful GUI
+- [ ] "all that should be inside"
+- [x] primitive GUI
+- [ ] beautiful GUI

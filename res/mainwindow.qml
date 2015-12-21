@@ -4,16 +4,12 @@ import Material.ListItems 0.1 as ListItem
 import SocialBlock.connector 1.0
 
 ApplicationWindow {
-    id: demo
+    id: window
 
     title: "SocialBlock"
 
     // Necessary when loading the window from C++
     visible: true
-
-    SBConnector {
-        id: manager
-    }
 
     theme {
         primaryColor: Palette.colors["blue"]["500"]
@@ -27,6 +23,13 @@ ApplicationWindow {
             "Friday", "Saturday", "Sunday"
     ]
 
+    property int selectedProf: manager.getCurrentProfileNumber()
+
+    property int selectedDay: {
+        var d = new Date();
+        return d.getDay() - 1
+    }
+
     property var basicComponents: [
             "Button", "CheckBox", "Progress Bar", "Radio Button",
             "Slider", "Switch", "TextField"
@@ -36,12 +39,26 @@ ApplicationWindow {
             "Bottom Sheet", "Dialog", "Forms", "List Items", "Page Stack", "Time Picker", "Date Picker"
     ]
 
-    Repeater {
-        id: weekdays
-        model: manager.getProfilesCount()
-    }
+//    Repeater {
+//        id: weekdays
+//        model: manager.getProfilesCount()
+//        delegate: days
+//    }
 
-    property var sections: [ days, days, days, days /*basicComponents, compoundComponents*/ ]
+//    property var sections: [ days, days, days, days, days, days, days, days, days]
+
+    SBConnector {
+        id: manager
+
+        onExitApplication: Qt.quit();
+        onOpenApplication: window.show();
+
+//        onSettingsLoaded: {
+//            var count = getProfilesCount()
+//            for ( var i = 1; i < count; i++)
+//                sections.push( days )
+//        }
+    }
 
     property var sectionTitles: manager.getProfileNames()
 
@@ -52,7 +69,7 @@ ApplicationWindow {
 
         title: "SocialBlock"
 
-        actionBar.maxActionCount: 3 //navDrawer.enabled ? 3 : 4
+        actionBar.maxActionCount: 4 //navDrawer.enabled ? 3 : 4
 
         actions: [
             Action {
@@ -62,15 +79,22 @@ ApplicationWindow {
             },
 
             Action {
+                iconName: "content/save"
+                name: "Save"
+                onTriggered: manager.save()
+            },
+
+            Action {
                 iconName: "action/settings"
                 name: "Settings"
                 hoverAnimation: true
+               //onTriggered: window.showError(selectedProf.toString(), "Do you want to retry?", "Close", true)
             },
 
             Action {
                 iconName: "awesome/user_plus"
                 name: "Add profile"
-                onTriggered: demo.showError("Something went wrong", "Do you want to retry?", "Close", true)
+                onTriggered: window.showError("Something went wrong", "Do you want to retry?", "Close", true)
             },
 
             Action {
@@ -86,74 +110,131 @@ ApplicationWindow {
             },
 
             Action {
-                iconName: "action/alarm_off"
-                name: "Remove time interval"
+                iconName: "content/clear"
+                name: "Exit"
+                hoverAnimation: true
+                onTriggered: manager.exitTriggered()
             }
         ]
 
-        backAction: navDrawer.action
 
-        NavigationDrawer {
-            id: navDrawer
-
-            enabled: page.width < Units.dp(500)
-
-            Flickable {
-                anchors.fill: parent
-
-                contentHeight: Math.max(content.implicitHeight, height)
-
-                Column {
-                    id: content
+//        Component {
+//            id: tabComponent
+        Repeater {
+            id: tabRep
+            model: sectionTitles
+            Tab {
+                title: sectionTitles[index]
+                onActiveChanged:// {
+                    selectedProf = index
+//                    colomnRep.model = manager.getTimesList(selectedProf, selectedDay)
+//                }
+                Row {
                     anchors.fill: parent
+                    Rectangle {
+                        id: daysList
+                        // left bar with weekdays
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        width: parent.width / 4
+                        Flickable {
+                            anchors.fill: parent
+                            contentHeight: Math.max(daysView.implicitHeight, height)
 
-                    Repeater {
-                        model: sections
+                            View {
+                                anchors.fill: parent
+                                anchors.rightMargin: 15
+                                elevation:  3
+                                Column {
+                                    id: daysView
+                                    anchors.fill: parent
 
-                        delegate: Column {
-                            width: parent.width
+                                    Repeater {
+                                        model: days
+                                        ListItem.Standard {
+                                            id: dayListItem
+                                            text: index == selectedDay ? "<b>"+days[index]+"<\b>" : days[index]
 
-                            ListItem.Subheader {
-                                text: sectionTitles[index]
-                            }
-
-                            Repeater {
-                                model: modelData
-                                delegate: ListItem.Standard {
-                                    text: modelData
-                                    selected: modelData == demo.selectedComponent
-                                    onClicked: {
-                                        demo.selectedComponent = modelData
-                                        navDrawer.close()
+//                                            backgroundColor: index == selectedDay ? "#EEEEEE" : "white"
+                                            onClicked: selectedDay = index
+                                        }
                                     }
                                 }
                             }
+                        }
+                    }
+                    Rectangle {
+                        id: intervalField
+                        // right field with intervals
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: daysList.right
+
+                        Flickable {
+                            id: interFl
+                            anchors.fill: parent
+                            contentHeight:intervColumn.implicitHeight+30
+                            View {
+                                anchors.fill: parent
+                                anchors.margins: 15
+                                elevation: 3
+                                Column {
+                                    id: intervColumn
+                                    anchors.fill: parent
+
+                                    Repeater {
+                                        id: colomnRep
+                                        model: manager.getTimesList(selectedProf, selectedDay)
+                                        ListItem.Subtitled {
+
+                                            text: modelData
+                                            subText: "dsfsdf"+selectedProf+ " "+selectedDay //manager.getSitesList(selectedProf, selectedDay)[index]
+                                            maximumLineCount: 3
+                                            secondaryItem: Icon {
+                                                name: "action/alarm_off"
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                visible: true
+                                                // TODO!!^^^^ ! manager.blocked
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked:{
+                                                        manager.deleteInterval(selectedDay, selectedDay, index)
+                                                        colomnRep.model = manager.getTimesList(selectedProf, selectedDay)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Scrollbar {
+                            flickableItem: interFl
                         }
                     }
                 }
             }
         }
 
-        Repeater {
-            model: !navDrawer.enabled ? sections : 0
+//        }
 
-            delegate: Tab {
-                title: sectionTitles[index]
+//        Loader {
+//            anchors.fill: parent
+//            sourceComponent: tabComponent
+//        }
 
-                property string selectedComponent: modelData[0]
-                property var section: modelData
 
-                sourceComponent: tabDelegate
-            }
-        }
 
-        Loader {
-            anchors.fill: parent
-            sourceComponent: tabDelegate
 
-            property var section: []
-            visible: navDrawer.enabled
-        }
+
+
+
+
+
+
+
     }
 
     Dialog {
@@ -256,9 +337,9 @@ ApplicationWindow {
                     // selectedComponent will always be valid, as it defaults to the first component
                     source: {
                         if (navDrawer.enabled) {
-                            return Qt.resolvedUrl("%1Demo.qml").arg(demo.selectedComponent.replace(" ", ""))
+                            return Qt.resolvedUrl("%1window.qml").arg(window.selectedComponent.replace(" ", ""))
                         } else {
-                            return Qt.resolvedUrl("%1Demo.qml").arg(selectedComponent.replace(" ", ""))
+                            return Qt.resolvedUrl("%1window.qml").arg(selectedComponent.replace(" ", ""))
                         }
                     }
                 }

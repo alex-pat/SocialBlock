@@ -5,7 +5,14 @@
 Profile::Profile() :
     name ("Untitled")
 {
+    for (int j = 0; j < 7; j++) {
+        for (int i = 0; i < 10; i++) {
+            BlockInterval *interv = new BlockInterval;
+            interv->setBeginTime(i,j);
+            week[j].push_back( interv );
+        }
 
+    }
 }
 
 void Profile::addInterval(int day, BlockInterval *newInterv) {
@@ -128,4 +135,21 @@ QDataStream& operator>> (QDataStream& stream, Profile* prof) {
             stream >> prof->week[i][j];
         }
     }
+    return stream;
+}
+
+QStringList Profile::getIntervals(int day) const {
+    QStringList result;
+    QListIterator<BlockInterval*> iter (week[day]);
+    while (iter.hasNext())
+        result << iter.next()->getTime();
+    return result;
+}
+
+QStringList Profile::getSites(int day) const {
+    QStringList result;
+    QListIterator<BlockInterval*> iter (week[day]);
+    while (iter.hasNext())
+        result << ( iter.next()->getSitesString() );
+    return result;
 }

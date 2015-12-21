@@ -2,8 +2,8 @@
 #include <QFile>
 #include <iostream>
 
-Manager::Manager( QObject* parent ) :
-    QObject (parent),
+Manager::Manager( /*QObject* parent*/ ) :
+    //QObject (parent),
     currentProfile (0)
 { }
 
@@ -82,4 +82,8 @@ void Manager::loadData() {
         stngs >> prof;
         profiles.push_back( prof );
     }
+}
+
+int Manager::getCurrentNumber() const {
+    return currentProfile;
 }

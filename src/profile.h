@@ -17,6 +17,8 @@ public:
     void removeFromHosts ( );
     void setName ( QString newName );
     QString getName() const;
+    QStringList getIntervals(int day) const;
+    QStringList getSites (int day) const;
 
     friend QDataStream& operator<< (QDataStream& stream, Profile& prof);
     friend QDataStream& operator>> (QDataStream& stream, Profile* prof);

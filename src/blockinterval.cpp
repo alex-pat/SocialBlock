@@ -49,6 +49,7 @@ BlockInterval& BlockInterval::operator = (BlockInterval& second) {
     timeBegin = second.timeBegin;
     timeEnd = second.timeEnd;
     addresses = second.addresses;
+    return *this;
 }
 
 QDataStream& operator<< (QDataStream& stream, BlockInterval& interv) {
@@ -71,4 +72,15 @@ QDataStream& operator>> (QDataStream& stream, BlockInterval* interv) {
         stream >> tempString;
         interv->addresses.push_back(tempString);
     }
+    return stream;
+}
+
+QString BlockInterval::getTime() {
+    return ( timeBegin.toString("HH:mm")
+             + " - " +
+             timeEnd.toString("HH:mm") );
+}
+
+QString BlockInterval::getSitesString() {
+    return addresses.join(' ');
 }

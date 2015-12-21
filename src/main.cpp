@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/mainwindow.qml")));
 
+
     QApplication::setQuitOnLastWindowClosed(false);
 
     return a.exec();

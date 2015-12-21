@@ -15,6 +15,8 @@ public:
     void setEndTime (int hh, int mm);
     void setNewAdresses (QStringList &newAddr);
     bool isIncludeTime ( );
+    QString getTime ();
+    QString getSitesString();
     QStringList& getAddresses();
     BlockInterval& operator = (BlockInterval& second);
 
