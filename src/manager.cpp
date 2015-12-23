@@ -35,7 +35,7 @@ void Manager::stopBlock() {
 }
 
 void Manager::saveData() {
-    QFile settings ("sbsettings");
+    QFile settings (".sbsettings");
     if ( settings.open ( QIODevice::WriteOnly ) == false ) {
         std::cerr << "Cannot open settings" << std::endl;
         exit(1);
@@ -49,7 +49,7 @@ void Manager::saveData() {
 }
 
 void Manager::loadData() {
-    QFile settings ("sbsettings");
+    QFile settings (".sbsettings");
     if ( settings.exists() == false ) {
         writeDefaults();
         return;

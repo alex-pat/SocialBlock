@@ -30,6 +30,12 @@ public:
     Q_INVOKABLE int getCurrentProfileNumber();
     Q_INVOKABLE QStringList getTimesList( int profile, int day);
     Q_INVOKABLE QStringList getSitesList (int profile, int day);
+    Q_INVOKABLE void addProfile ( QString name, QString sites);
+    Q_INVOKABLE void deleteProfile (int profile);
+    Q_INVOKABLE void addInterval (int profile,    int day,
+                                  int hoursBegin, int minuteBegin,
+                                  int hoursEnd,   int minuteEnd,
+                                  QString sites);
 
     bool isBlocked() const;
     bool isTracked() const;

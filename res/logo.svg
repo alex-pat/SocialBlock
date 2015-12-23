@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><path d="M24 2L6 10v12c0 11.11 7.67 21.47 18 24 10.33-2.53 18-12.89 18-24V10L24 2zm-4 32l-8-8 2.83-2.83L20 28.34l13.17-13.17L36 18 20 34z"/></svg>
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created using Karbon, part of Calligra: http://www.calligra.org/karbon -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="38.4pt" height="38.4pt">
+<defs>
+  <linearGradient id="gradient0" gradientTransform="" gradientUnits="objectBoundingBox" x1="0.50499189027" y1="1.00000000000" x2="0.49720281227" y2="0.00000000000" spreadMethod="pad">
+   <stop stop-color="#00fff2" offset="0.00000000000" stop-opacity="0.00000000000"/>
+   <stop stop-color="#24e5d8" offset="0.27000001073" stop-opacity="1.00000000000"/>
+   <stop stop-color="#48e9df" offset="0.50000000000" stop-opacity="1.00000000000"/>
+   <stop stop-color="#ffffff" offset="1.00000000000" stop-opacity="1.00000000000"/>
+  </linearGradient>
+ </defs>
+<g id="layer0">
+  <path id="shape0" transform="translate(6, 2)" fill="url(#gradient0)" stroke="#000000" stroke-width="0.27540000000" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="2.00000000000" d="M17.3754 0L0 8.01818L0 20.0455C0 31.1807 7.40385 41.5642 17.3754 44.1C27.3469 41.5642 34.7508 31.1807 34.7508 20.0455L34.7508 8.01818ZM13.5142 32.0727L5.7918 24.0545L8.5236 21.2181L13.5142 26.3999L26.2272 13.1999L28.959 16.0364Z"/>
+ </g>
+</svg>

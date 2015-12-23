@@ -1,27 +1,18 @@
 #include "connector.h"
-
 #include "src/profile.h"
 
 Connector::Connector( QObject *parent ) : QObject(parent) {
     manag = new Manager;
-//    Profile *newprof ;
-//    for (int i = 0; i < 3; i++) {
-//        newprof = new Profile;
-//        newprof->setName(QString::number(i));
-//        manag->addProfile(newprof);
-//    }
 
     manag->loadData();
-    //manag->saveData();
-    //emit settingsLoaded();
 
     QAction* actionShow = new QAction ("SocialBlock", this);
     connect(actionShow, SIGNAL(triggered(bool)),
-            this,       SLOT(openTriggered()));
+            this,       SIGNAL(openApplication()));
 
     QAction* actionExit = new QAction ("Exit", this);
     connect(actionExit, SIGNAL(triggered(bool)),
-            this,       SIGNAL(openApplication()));
+            this,       SLOT(exitTriggered()));
 
     iconMenu = new QMenu;
     iconMenu->addAction(actionShow);
@@ -115,4 +106,28 @@ bool Connector::isTracked() const {
 
 void Connector::setCurrentProfileNumber( int profile ) {
     manag->setCurrentProfile( profile );
+}
+
+void Connector::addProfile(QString name, QString sites) {
+    Profile* newProfile = new Profile;
+    newProfile->setName(name);
+    QStringList urlList = sites.split('\n');
+    newProfile->fillStandartList( urlList );
+    manag->addProfile(newProfile);
+}
+
+void Connector::deleteProfile(int index) {
+    manag->deleteProfile( index );
+}
+
+void Connector::addInterval(int profile,    int day,
+                            int hoursBegin, int minuteBegin,
+                            int hoursEnd,   int minuteEnd,
+                            QString sites) {
+    BlockInterval* newInterv = new BlockInterval;
+    newInterv->setBeginTime(hoursBegin, minuteBegin);
+    newInterv->setEndTime  (hoursEnd,   minuteEnd);
+    QStringList urlList = sites.split('\n');
+    newInterv->setNewAdresses( urlList );
+    manag->profiles[profile]->addInterval(day, newInterv);
 }

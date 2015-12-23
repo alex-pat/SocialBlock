@@ -1,19 +1,10 @@
 #include "profile.h"
 #include <QFile>
 #include <iostream>
-#include <QMessageBox>
+
 Profile::Profile() :
     name ("Untitled")
-{
-//    for (int j = 0; j < 7; j++) {
-//        for (int i = 0; i < 10; i++) {
-//            BlockInterval *interv = new BlockInterval;
-//            interv->setBeginTime(i,j);
-//            week[j].push_back( interv );
-//        }
-
-//    }
-}
+{ }
 
 void Profile::addInterval(int day, BlockInterval *newInterv) {
     week[day].push_back(newInterv);
@@ -34,7 +25,7 @@ void Profile::setName(QString newName) {
 }
 
 void Profile::writeToHosts() {
-    QFile hosts ("hosts");
+    QFile hosts ("/etc/hosts");
     if ( hosts.open( QIODevice::WriteOnly |
                      QIODevice::Text |
                      QIODevice::Append ) == false ) {
@@ -52,32 +43,36 @@ void Profile::writeToHosts() {
 
     if ( ! intervIter.hasNext() )
         return;
-    QListIterator <QString> site (intervIter.peekPrevious()->getAddresses());
+    QListIterator <QString> site (intervIter.peekNext()->getAddresses());
+
+    //writing strings to hosts
     while ( site.hasNext() ) {
-        QString str ("127.0.0.1\t" + site.peekNext() + "\t# Blocked by SocialBlock\n"
-                  "127.0.0.1\twww." + site.next() + "\t# Blocked by SocialBlock\n" );
-        QMessageBox::information(0, "sfdf",str);
+        QString str = "127.0.0.1\t" + site.peekNext() + "\t# Blocked by SocialBlock\n"
+                  "127.0.0.1\twww." + site.peekNext() + "\t# Blocked by SocialBlock\n";
         hosts.write( str.toStdString().c_str() );
+        site.next();
     }
 
     hosts.close();
 }
 
 void Profile::removeFromHosts() {
+    QFile hosts ("/etc/hosts");
+    if ( hosts.exists() == false )
+        return;
+
     int today = QDate::currentDate().dayOfWeek() - 1;
 
     //current list search
     QListIterator <BlockInterval* > intervIter (week[today]);
     while ( intervIter.hasNext() &&
-            !( intervIter.next()->isIncludeTime() ) )
-        ;
+            !( intervIter.peekNext()->isIncludeTime() ) )
+        intervIter.next();
 
-    if ( ! intervIter.hasNext() )
+    // ejecting data from hosts
+    if ( intervIter.hasNext() == false )
         return;
 
-    QStringListIterator sites (intervIter.peekPrevious()->getAddresses() );
-
-    QFile hosts ("hosts");
     if ( hosts.open( QIODevice::ReadOnly |
                      QIODevice::Text ) == false ) {
         std::cerr << "Cannot open /etc/hosts" << std::endl;
@@ -87,20 +82,22 @@ void Profile::removeFromHosts() {
     QStringList listHosts = QString( hosts.readAll().toStdString().c_str() ).split('\n');
     hosts.close();
 
+    //deleting strings from list
     QMutableStringListIterator iterHosts(listHosts);
 
-    while ( iterHosts.hasNext() ) {
-        iterHosts.next();
-        sites.toFront();
-        while ( sites.hasNext() )
-            if ( iterHosts.peekPrevious().contains(sites.peekNext()) ) {
+    QStringListIterator sites (intervIter.peekNext()->getAddresses() );
+
+    while ( sites.hasNext() ) {
+        iterHosts.toFront();
+        do {
+            iterHosts.next();
+            if ( iterHosts.peekPrevious().contains( sites.peekNext() ) )
                 iterHosts.remove();
-                break;
-            }
-        if ( !sites.hasNext() )
-            iterHosts.previous();
+        } while ( iterHosts.hasNext() );
+        sites.next();
     }
 
+    //writing changes
     if ( hosts.open( QIODevice::WriteOnly |
                      QIODevice::Text ) == false ) {
         std::cerr << "Cannot open /etc/hosts" << std::endl;
@@ -108,7 +105,6 @@ void Profile::removeFromHosts() {
     }
 
     hosts.write ( listHosts.join('\n').toStdString().c_str() );
-
 }
 
 QString Profile::getName() const {
@@ -162,4 +158,14 @@ bool Profile::isBlockedNow() const {
         if ( iter.next()->isIncludeTime() )
             return true;
     return false;
+}
+
+void Profile::fillStandartList(QStringList &urlList) {
+    for (int i = 0; i < 7; i++) {
+        BlockInterval* interv = new BlockInterval;
+        interv->setBeginTime( 9, 0);
+        interv->setEndTime  (12, 0);
+        interv->setNewAdresses (urlList);
+        addInterval(i, interv);
+    }
 }
