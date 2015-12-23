@@ -2,8 +2,7 @@
 #include <QFile>
 #include <iostream>
 
-Manager::Manager( /*QObject* parent*/ ) :
-    //QObject (parent),
+Manager::Manager( ) :
     currentProfile (0)
 { }
 
@@ -27,11 +26,10 @@ void Manager::startBlock() {
     profiles[currentProfile]->writeToHosts();
 
 }
-
 void Manager::stopBlock() {
     if ( profiles.isEmpty() )
         return;
-    profiles[currentProfile]->removeFromHosts();
+    profiles[currentProfile]->removeFromHosts( false );
 }
 
 void Manager::saveData() {

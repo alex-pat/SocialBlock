@@ -2,23 +2,16 @@
 #define MANAGER_H
 
 #include <QVector>
-//#include <QObject>
 #include "src/profile.h"
 
-class Manager //: public QObject
+class Manager
 {
-    //Q_OBJECT
-
     friend class Connector;
-
-//    QStringListModel profileNames;
 
     QVector < Profile* > profiles;
     int currentProfile;
 public:
-    Manager( /*QObject *parent = 0*/ );
-
-//    Q_INVOKABLE QStringListModel getDays();
+    Manager();
 
     void addProfile ( Profile* newProfile );
     void deleteProfile ( int index );
@@ -31,8 +24,6 @@ public:
     void writeDefaults ();
     bool isBlockedNow () const;
 
-//signals:
-//    void profileNamesChanged(QStringList);
 };
 
 #include "src/connector.h"

@@ -28,8 +28,10 @@ void BlockInterval::setEndTime(int hh, int mm) {
     timeEnd.setHMS(hh, mm, 0);
 }
 
-bool BlockInterval::isIncludeTime( ) {
+bool BlockInterval::isIncludeTime( bool now ) {
     QTime current = QTime::currentTime();
+    if ( !now )
+        current = current.addSecs(-60);
     if ( current < timeBegin )
         return false;
     if ( current > timeEnd )

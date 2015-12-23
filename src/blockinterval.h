@@ -14,7 +14,7 @@ public:
     void setBeginTime (int hh, int mm);
     void setEndTime (int hh, int mm);
     void setNewAdresses (QStringList &newAddr);
-    bool isIncludeTime ( );
+    bool isIncludeTime ( bool isNow = true ); //isNow says that we data during blocking
     QString getTime ();
     QString getSitesString();
     QStringList& getAddresses();

@@ -118,6 +118,7 @@ void Connector::addProfile(QString name, QString sites) {
 
 void Connector::deleteProfile(int index) {
     manag->deleteProfile( index );
+    emit exitApplication();
 }
 
 void Connector::addInterval(int profile,    int day,

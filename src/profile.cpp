@@ -56,7 +56,7 @@ void Profile::writeToHosts() {
     hosts.close();
 }
 
-void Profile::removeFromHosts() {
+void Profile::removeFromHosts( bool isNow ) {
     QFile hosts ("/etc/hosts");
     if ( hosts.exists() == false )
         return;
@@ -66,21 +66,21 @@ void Profile::removeFromHosts() {
     //current list search
     QListIterator <BlockInterval* > intervIter (week[today]);
     while ( intervIter.hasNext() &&
-            !( intervIter.peekNext()->isIncludeTime() ) )
+            !( intervIter.peekNext()->isIncludeTime( isNow ) ) )
         intervIter.next();
 
     // ejecting data from hosts
     if ( intervIter.hasNext() == false )
         return;
 
-    if ( hosts.open( QIODevice::ReadOnly |
+
+    if ( hosts.open( QIODevice::ReadWrite |
                      QIODevice::Text ) == false ) {
         std::cerr << "Cannot open /etc/hosts" << std::endl;
         return;
     }
 
     QStringList listHosts = QString( hosts.readAll().toStdString().c_str() ).split('\n');
-    hosts.close();
 
     //deleting strings from list
     QMutableStringListIterator iterHosts(listHosts);
@@ -97,14 +97,10 @@ void Profile::removeFromHosts() {
         sites.next();
     }
 
-    //writing changes
-    if ( hosts.open( QIODevice::WriteOnly |
-                     QIODevice::Text ) == false ) {
-        std::cerr << "Cannot open /etc/hosts" << std::endl;
-        return;
-    }
-
+    //writings changes
+    hosts.resize(0);
     hosts.write ( listHosts.join('\n').toStdString().c_str() );
+    hosts.close();
 }
 
 QString Profile::getName() const {

@@ -93,7 +93,7 @@ ApplicationWindow {
                 enabled: !manager.istracked
                 onTriggered: {
                     manager.deleteProfile( selectedProf );
-                    Qt.quit()
+                    //Qt.quit()
                 }
             },
 
@@ -191,9 +191,10 @@ ApplicationWindow {
                                             secondaryItem: Icon {
                                                 name: "action/alarm_off"
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                visible: !manager.isblocked
+                                                opacity: manager.istracked ? 0.5 : 1
                                                 MouseArea {
                                                     anchors.fill: parent
+                                                    enabled: !manager.istracked
                                                     onClicked:{
                                                         manager.deleteInterval(selectedProf, selectedDay, index)
                                                         columnRep.model = manager.getTimesList(selectedProf, selectedDay)
@@ -223,7 +224,7 @@ ApplicationWindow {
         Row {
             id: addIntervDialRow
             anchors.fill: parent
-            anchors.bottom: parent.bottom / 5
+            height: parent.height / 5
             Button {
                 id: timeFromButton
                 anchors.left: parent.left
@@ -378,7 +379,7 @@ ApplicationWindow {
 
        onAccepted: {
            manager.addProfile (newProfName.text, profTextField.text)
-           Qt.quit();
+           //Qt.quit();
        }
     }
 }

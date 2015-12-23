@@ -14,7 +14,7 @@ public:
     void deleteInterval (int day, int index);
     void changeInterval (int day, int index, BlockInterval& newInterv );
     void writeToHosts ( );
-    void removeFromHosts ( );
+    void removeFromHosts ( bool isNow = true ); //isNow says that we data during blocking
     void setName ( QString newName );
     QString getName() const;
     QStringList getIntervals(int day) const;
