@@ -13,19 +13,20 @@ QT += core \
 
 TARGET = SocialBlock
 TEMPLATE = app
-
+CONFIG += c++11
 
 SOURCES += src/main.cpp \
     src/blockinterval.cpp \
     src/profile.cpp \
-    src/manager.cpp \
-    src/connector.cpp
+    src/database.cpp \
+    src/manager.cpp
 
 HEADERS  += \
     src/blockinterval.h \
     src/profile.h \
+    src/database.h \
     src/manager.h \
-    src/connector.h
+    src/os_dependent.h
 
 RESOURCES += \
     res/resources.qrc

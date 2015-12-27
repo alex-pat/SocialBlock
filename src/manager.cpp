@@ -1,133 +1,134 @@
 #include "manager.h"
-#include <QFile>
-#include <iostream>
+#include "src/profile.h"
 
-Manager::Manager( ) :
-    currentProfile (0)
-{ }
+Manager::Manager( QObject *parent ) : QObject(parent) {
+    base = new Database;
 
-void Manager::addProfile(Profile *newProfile) {
-    profiles.push_back( newProfile );
+    base->loadData();
+
+    QAction* actionShow = new QAction ("SocialBlock", this);
+    connect(actionShow, SIGNAL(triggered(bool)),
+            this,       SIGNAL(openApplication()));
+
+    QAction* actionExit = new QAction ("Exit", this);
+    connect(actionExit, SIGNAL(triggered(bool)),
+            this,       SLOT(exitTriggered()));
+
+    iconMenu = new QMenu;
+    iconMenu->addAction(actionShow);
+    iconMenu->addAction(actionExit);
+
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(iconMenu);
+    trayIcon->setToolTip("SocialBlock");
+    trayIcon->setIcon(QPixmap("://logo.svg"));
+    trayIcon->show();
+
+    isblocked = false;
+    istracked = false;
+
+    timer = new QTimer (this);
+    connect (timer, SIGNAL(timeout()),
+             this,  SLOT (timeout()));
+}
+
+Manager::~Manager() {
+    base->saveData();
+    delete base;
+}
+
+QStringList Manager::getProfileNames() {
+    QStringList resultNames;
+    int count = getProfilesCount();
+    for (int i = 0; i < count; i++)
+        resultNames << base->profiles[i]->getName();
+    return resultNames;
+}
+
+int Manager::getProfilesCount() {
+    return base->profiles.size();
+}
+
+int Manager::getCurrentProfileNumber() {
+    return base->getCurrentNumber();
+}
+
+QStringList Manager::getTimesList(int profile, int day) {
+    return base->profiles[profile]->getIntervals(day);
+}
+
+QStringList Manager::getSitesList(int profile, int day) {
+    return base->profiles[profile]->getSites(day);
+}
+
+void Manager::exitTriggered() {
+    if ( isblocked == false )
+        emit exitApplication();
+}
+
+void Manager::deleteInterval(int profile, int day, int interv) {
+    base->profiles[profile]->deleteInterval(day, interv);
+}
+
+void Manager::save() {
+    base->saveData();
+}
+
+void Manager::timeout() {
+    if ( base->isBlockedNow() == isblocked )
+        return;
+    isblocked = !isblocked;
+    if ( isblocked == true )
+        base->startBlock();
+    else
+        base->stopBlock();
+    emit blockedChanged();
+}
+
+void Manager::trackTriggered() {
+    if (istracked == true )
+        timer->stop();
+    else {
+        timer->start( 60*1000 );
+        timeout();
+    }
+    istracked = !istracked;
+    emit istrackedChanged();
+}
+
+bool Manager::isBlocked() const {
+    return isblocked;
+}
+
+bool Manager::isTracked() const {
+    return istracked;
+}
+
+void Manager::setCurrentProfileNumber( int profile ) {
+    base->setCurrentProfile( profile );
+}
+
+void Manager::addProfile(QString name, QString sites) {
+    Profile* newProfile = new Profile;
+    newProfile->setName(name);
+    QStringList urlList = sites.split('\n');
+    newProfile->fillStandartList( urlList );
+    base->addProfile(newProfile);
 }
 
 void Manager::deleteProfile(int index) {
-    delete profiles[ index ];
-    profiles.remove(index);
+    base->deleteProfile( index );
+    emit exitApplication();
 }
 
-void Manager::setCurrentProfile(int index) {
-    currentProfile = index;
-}
-
-void Manager::startBlock() {
-    if ( profiles.isEmpty() )
-        return;
-    profiles[currentProfile]->removeFromHosts();
-    profiles[currentProfile]->writeToHosts();
-
-}
-void Manager::stopBlock() {
-    if ( profiles.isEmpty() )
-        return;
-    profiles[currentProfile]->removeFromHosts( false );
-}
-
-void Manager::saveData() {
-    QFile settings (".sbsettings");
-    if ( settings.open ( QIODevice::WriteOnly ) == false ) {
-        std::cerr << "Cannot open settings" << std::endl;
-        exit(1);
-    }
-    QDataStream stngs (&settings);
-    int size = profiles.size();
-    stngs << size
-          << currentProfile;
-    for (int i = 0; i < size; i++)
-        stngs << *(profiles[i]);
-}
-
-void Manager::loadData() {
-    QFile settings (".sbsettings");
-    if ( settings.exists() == false ) {
-        writeDefaults();
-        return;
-    }
-    if ( settings.open ( QIODevice::ReadOnly ) == false ) {
-        std::cerr << "Cannot open settings" << std::endl;
-        exit(1);
-    }
-    QDataStream stngs (&settings);
-    int size;
-    stngs >> size
-          >> currentProfile;
-    for (int i = 0; i < size; i++) {
-        Profile* prof = new Profile;
-        stngs >> prof;
-        profiles.push_back( prof );
-    }
-}
-
-int Manager::getCurrentNumber() const {
-    return currentProfile;
-}
-
-void Manager::writeDefaults() {
-    currentProfile = 0;
-    Profile* hastilyWork = new Profile;
-    hastilyWork->setName("Hastily work");
-    for (int i = 0; i < 7; i++) {
-        BlockInterval* interv = new BlockInterval;
-        interv->setBeginTime(9,0);
-        interv->setEndTime(12,0);
-        hastilyWork->addInterval(i, interv);
-    }
-    for (int i = 0; i < 7; i++) {
-        BlockInterval* interv = new BlockInterval;
-        interv->setBeginTime(14,0);
-        interv->setEndTime(17,0);
-        hastilyWork->addInterval(i, interv);
-    }
-    profiles.push_back(hastilyWork);
-
-    Profile* passableWork = new Profile;
-    passableWork->setName("Passable work");
-    for (int i = 0; i < 7; i++) {
-        BlockInterval* interv = new BlockInterval;
-        interv->setBeginTime(8,0);
-        interv->setEndTime(12,0);
-        passableWork->addInterval(i, interv);
-    }
-    for (int i = 0; i < 7; i++) {
-        BlockInterval* interv = new BlockInterval;
-        interv->setBeginTime(13,0);
-        interv->setEndTime(17,0);
-        passableWork->addInterval(i, interv);
-    }
-    profiles.push_back(passableWork);
-
-    Profile* stakhanov = new Profile;
-    stakhanov->setName("Stakhanov");
-    for (int i = 0; i < 7; i++) {
-        BlockInterval* interv = new BlockInterval;
-        interv->setBeginTime(7,0);
-        interv->setEndTime(19,0);
-        stakhanov->addInterval(i, interv);
-    }
-    profiles.push_back(stakhanov);
-
-    Profile* sociopath = new Profile;
-    sociopath->setName("sociopath");
-    for (int i = 0; i < 7; i++) {
-        BlockInterval* interv = new BlockInterval;
-        interv->setBeginTime(0,0);
-        interv->setEndTime(23,59);
-        sociopath->addInterval(i, interv);
-    }
-    profiles.push_back(sociopath);
-
-    saveData();
-}
-
-bool Manager::isBlockedNow() const {
-    return profiles[currentProfile]->isBlockedNow();
+void Manager::addInterval(int profile,    int day,
+                            int hoursBegin, int minuteBegin,
+                            int hoursEnd,   int minuteEnd,
+                            QString sites) {
+    BlockInterval* newInterv = new BlockInterval;
+    newInterv->setBeginTime(hoursBegin, minuteBegin);
+    newInterv->setEndTime  (hoursEnd,   minuteEnd);
+    QStringList urlList = sites.split('\n');
+    newInterv->setNewAdresses( urlList );
+    base->profiles[profile]->addInterval(day, newInterv);
 }

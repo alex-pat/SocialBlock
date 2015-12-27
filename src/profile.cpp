@@ -1,4 +1,5 @@
 #include "profile.h"
+#include "os_dependent.h"
 #include <QFile>
 #include <iostream>
 
@@ -25,11 +26,11 @@ void Profile::setName(QString newName) {
 }
 
 void Profile::writeToHosts() {
-    QFile hosts ("/etc/hosts");
+    QFile hosts (HOSTS);
     if ( hosts.open( QIODevice::WriteOnly |
                      QIODevice::Text |
                      QIODevice::Append ) == false ) {
-        std::cerr << "Cannot open /etc/hosts" << std::endl;
+        std::cerr << "Cannot open hosts file" << std::endl;
         exit(1);
     }
 
@@ -57,7 +58,7 @@ void Profile::writeToHosts() {
 }
 
 void Profile::removeFromHosts( bool isNow ) {
-    QFile hosts ("/etc/hosts");
+    QFile hosts ("HOSTS");
     if ( hosts.exists() == false )
         return;
 
@@ -76,7 +77,7 @@ void Profile::removeFromHosts( bool isNow ) {
 
     if ( hosts.open( QIODevice::ReadWrite |
                      QIODevice::Text ) == false ) {
-        std::cerr << "Cannot open /etc/hosts" << std::endl;
+        std::cerr << "Cannot open hosts file" << std::endl;
         return;
     }
 
@@ -132,8 +133,10 @@ QDataStream& operator>> (QDataStream& stream, Profile* prof) {
     return stream;
 }
 
-QStringList Profile::getIntervals(int day) const {
+QStringList Profile::getIntervals(int day) {
     QStringList result;
+    if ( day < 0 || day > 6 )
+        return result;
     QListIterator<BlockInterval*> iter (week[day]);
     while (iter.hasNext())
         result << iter.next()->getTime();

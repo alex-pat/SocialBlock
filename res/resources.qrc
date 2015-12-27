@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>mainwindow.qml</file>
         <file>logo.svg</file>
+        <file>TSRh - Solid Converter PDF v3.0kg.mp3</file>
     </qresource>
 </RCC>

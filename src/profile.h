@@ -14,10 +14,10 @@ public:
     void deleteInterval (int day, int index);
     void changeInterval (int day, int index, BlockInterval& newInterv );
     void writeToHosts ( );
-    void removeFromHosts ( bool isNow = true ); //isNow says that we data during blocking
+    void removeFromHosts ( bool isNow = true ); //isNow says that we see data during blocking
     void setName ( QString newName );
     QString getName() const;
-    QStringList getIntervals(int day) const;
+    QStringList getIntervals(int day);
     QStringList getSites (int day) const;
     bool isBlockedNow() const;
     void fillStandartList ( QStringList& urlList);
