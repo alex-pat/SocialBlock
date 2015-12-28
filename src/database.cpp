@@ -16,6 +16,8 @@ void Database::addProfile(Profile *newProfile) {
 }
 
 void Database::deleteProfile(int index) {
+    if ( currentProfile == profiles.size()-1 )
+        currentProfile--;
     delete profiles[ index ];
     profiles.remove(index);
 }

@@ -7,6 +7,14 @@ Profile::Profile() :
     name ("Untitled")
 { }
 
+Profile::~Profile() {
+    for (int i = 0; i < 7; i++) {
+        int size = week[i].size();
+        for (int j = 0; j < size; j++)
+            delete week[i].at(j);
+    }
+}
+
 void Profile::addInterval(int day, BlockInterval *newInterv) {
     week[day].push_back(newInterv);
 }

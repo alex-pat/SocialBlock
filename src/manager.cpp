@@ -1,6 +1,8 @@
 #include "manager.h"
 #include "src/profile.h"
 
+bool isRestart = true;
+
 Manager::Manager( QObject *parent ) : QObject(parent) {
     base = new Database;
 
@@ -30,11 +32,16 @@ Manager::Manager( QObject *parent ) : QObject(parent) {
     timer = new QTimer (this);
     connect (timer, SIGNAL(timeout()),
              this,  SLOT (timeout()));
+    isRestart = false;
 }
 
 Manager::~Manager() {
     base->saveData();
     delete base;
+    delete iconMenu;
+    trayIcon->hide();
+    delete trayIcon;
+    delete timer;
 }
 
 QStringList Manager::getProfileNames() {
@@ -114,10 +121,15 @@ void Manager::addProfile(QString name, QString sites) {
     QStringList urlList = sites.split('\n');
     newProfile->fillStandartList( urlList );
     base->addProfile(newProfile);
+    base->saveData();
+    isRestart = true;
+    emit exitApplication();
 }
 
 void Manager::deleteProfile(int index) {
     base->deleteProfile( index );
+    base->saveData();
+    isRestart = true;
     emit exitApplication();
 }
 
@@ -131,4 +143,8 @@ void Manager::addInterval(int profile,    int day,
     QStringList urlList = sites.split('\n');
     newInterv->setNewAdresses( urlList );
     base->profiles[profile]->addInterval(day, newInterv);
+}
+
+void Manager::close() {
+    trayIcon->hide();
 }

@@ -10,6 +10,7 @@ class Profile
     QString name;
 public:
     Profile();
+    ~Profile();
     void addInterval (int day, BlockInterval* newInterv);
     void deleteInterval (int day, int index);
     void changeInterval (int day, int index, BlockInterval& newInterv );

@@ -9,10 +9,11 @@ ApplicationWindow {
 
     title: "SocialBlock"
     visible: true
+    minimumWidth: 500
+    minimumHeight: 200
 
     theme {
         primaryColor: Palette.colors["blue"]["500"]
-        primaryDarkColor: Palette.colors["blue"]["700"]
         accentColor: Palette.colors["blue"]["600"]
         tabHighlightColor: "white"
     }
@@ -25,7 +26,11 @@ ApplicationWindow {
     SBManager {
         id: manager
 
-        onExitApplication: Qt.quit()
+        onExitApplication: {
+            window.close()
+            manager.close()
+            Qt.quit()
+        }
         onOpenApplication: window.show()
     }
 
@@ -64,15 +69,6 @@ ApplicationWindow {
             },
 
             Action {
-                iconName: "action/settings"
-                name: "More"
-                hoverAnimation: true
-                enabled: !manager.istracked
-                onTriggered: actionSheet.open()
-            },
-
-
-            Action {
                 iconName: "action/assignment_turned_in"
                 name: "Set as current profile"
                 enabled: selectedProf !== manager.getCurrentProfileNumber() && !manager.isblocked
@@ -86,20 +82,14 @@ ApplicationWindow {
                 iconName: "awesome/user_plus"
                 name: "Add profile"
                 enabled: !manager.istracked
-                onTriggered: {
-                    addProfDialog.show();
-                    //Qt.quit()
-                }
+                onTriggered: addProfDialog.show();
             },
 
             Action {
                 iconName: "awesome/user_times"
                 name: "Delete profile"
                 enabled: !manager.istracked
-                onTriggered: {
-                    manager.deleteProfile( selectedProf );
-                    //Qt.quit()
-                }
+                onTriggered: manager.deleteProfile( selectedProf );
             },
 
             Action {
@@ -110,6 +100,12 @@ ApplicationWindow {
             },
 
             Action {
+                iconName: "awesome/angellist"
+                name: "About"
+                onTriggered: about.show()
+            },
+
+            Action {
                 iconName: "awesome/power_off"
                 name: "Exit"
                 hoverAnimation: true
@@ -117,31 +113,6 @@ ApplicationWindow {
                 onTriggered: manager.exitTriggered()
             }
         ]
-
-        BottomActionSheet {
-            id: actionSheet
-
-            title: "More"
-
-            actions: [
-                Action {
-                    iconName: "awesome/vk"
-                    name: "Add VK integration"
-                },
-
-                Action {
-                    iconName: "hardware/memory"
-                    name: "Add to autostart"
-                    hasDividerAfter: true
-                },
-
-                Action {
-                    iconName: "awesome/angellist"
-                    name: "About"
-                    onTriggered: about.show()
-                }
-            ]
-        }
 
         onSelectedTabChanged: selectedProf = page.selectedTab
 
@@ -157,13 +128,11 @@ ApplicationWindow {
                         // left bar with weekdays
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        //anchors.left: parent.left
                         width: parent.width / 4
                         color: "#F5F5F5"
                         Flickable {
                             anchors.fill: parent
                             contentHeight: Math.max(daysView.implicitHeight, height)
-
                             View {
                                 anchors.fill: parent
                                 anchors.rightMargin: 30
@@ -208,13 +177,10 @@ ApplicationWindow {
                                 Column {
                                     id: intervColumn
                                     anchors.fill: parent
-
                                     Repeater {
                                         id: columnRep
                                         model: manager.getTimesList(selectedProf, selectedDay)
-
                                         ListItem.Subtitled {
-
                                             text: modelData
                                             subText: manager.getSitesList(selectedProf, selectedDay)[index]
                                             maximumLineCount: 3
@@ -247,18 +213,20 @@ ApplicationWindow {
 
     Dialog {
         id: addIntervalDialog
-        title: "Adding interval"
+        title: "Add interval"
         hasActions: true
-        width: 300
-        height: 300
+        width: 290
+        height: 400
         Row {
             id: addIntervDialRow
             anchors.fill: parent
             height: parent.height / 5
+            Rectangle {
+                height: 30
+                width: 30
+            }
             Button {
                 id: timeFromButton
-                //anchors.left: parent.left
-                //anchors.leftMargin: 30
                 elevation: 1
                 backgroundColor: "#F5F5F5"
                 text: "08:00"
@@ -278,8 +246,7 @@ ApplicationWindow {
             }
             Label {
                 id: lineLabel
-                //anchors.left: timeFromButton.right
-                //anchors.right: timeToButton.left
+                width: 30
                 anchors.verticalCenter: timeFromButton.verticalCenter
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -287,7 +254,6 @@ ApplicationWindow {
             }
             Button {
                 id: timeToButton
-                //anchors.right: parent.right
                 anchors.rightMargin: 30
                 elevation: 1
                 backgroundColor: "#F5F5F5"
@@ -306,27 +272,28 @@ ApplicationWindow {
 
                 }
             }
-            Label {
-                id: sitesLabel
-                x: 0
-                y: 50
-                width: 50
-                height: 5
+        }
+        Rectangle {
+            height: 50
+            width: 2
+            opacity: 1
+        }
+
+        Label {
+            id: sitesLabel
                 text: "<b>Sites:<\b>"
-                //anchors.fill: parent
+                font.pixelSize: 15
             }
             Rectangle {
                 id: sitesEditRect
-                x: 0
-                y: 70
                 width: parent.width
-                height: 150
+                height: 250
                 visible: true
                 Flickable {
                     id: flAddInterv
                     anchors.fill: parent
                     contentWidth: textField.width
-                    contentHeight: textField.height + 30
+                    contentHeight: textField.height + 45
                     clip: true
                     TextEdit {
                         id: textField
@@ -351,9 +318,7 @@ ApplicationWindow {
                 Scrollbar {
                     flickableItem: flAddInterv
                 }
-            }
         }
-
         positiveButtonText: "OK"
         positiveButtonEnabled: ! ( timeFromButton.hours > timeToButton.hours ||
                                  ( timeFromButton.hours === timeToButton.hours
@@ -365,7 +330,6 @@ ApplicationWindow {
                                   timeToButton.hours, timeToButton.minutes,
                                   textField.text )
             columnRep.model = manager.getTimesList(selectedProf, selectedDay)
-            selectedDay += 1
         }
     }
     Dialog {
@@ -416,11 +380,7 @@ ApplicationWindow {
                flickableItem: flAddProf
            }
        }
-
-       onAccepted: {
-           manager.addProfile (newProfName.text, profTextField.text)
-           //Qt.quit();
-       }
+       onAccepted: manager.addProfile (newProfName.text, profTextField.text)
     }
 
     Dialog {
@@ -443,7 +403,6 @@ ApplicationWindow {
                 sourceSize.height: 150
             }
             onClicked: supermegakeygenmusic.play()
-
         }
         Text {
             text: "SocialBlock"
@@ -451,11 +410,11 @@ ApplicationWindow {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
         }
-        onClosed: supermegakeygenmusic.stop()
         Audio {
             id: supermegakeygenmusic
             source: "qrc:/TSRh - Solid Converter PDF v3.0kg.mp3"
         }
+        onClosed: supermegakeygenmusic.stop()
         Text {
             textFormat: Text.RichText
             text: "This software is licensed <br>" +
@@ -493,7 +452,7 @@ ApplicationWindow {
             spacing: 7
             IconButton {
                 iconName: "awesome/vk"
-                onClicked: Qt.openUrlExternally("http:/vk.com/postskript")
+                onClicked: Qt.openUrlExternally("http:/vk.com/post_skript")
                 size: 27
             }
             IconButton {

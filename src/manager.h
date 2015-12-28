@@ -39,6 +39,7 @@ public:
     Q_INVOKABLE void setCurrentProfileNumber( int profile );
     Q_INVOKABLE void deleteInterval( int profile, int day, int interv);
     Q_INVOKABLE void save ();
+    Q_INVOKABLE void close ();
 
     bool isBlocked() const;
     bool isTracked() const;
