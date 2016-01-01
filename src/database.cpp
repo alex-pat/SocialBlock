@@ -1,6 +1,7 @@
 #include "database.h"
 #include <QFile>
 #include <iostream>
+#include <QMessageBox>
 
 Database::Database () :
     currentProfile (0)
@@ -43,6 +44,7 @@ void Database::saveData() {
     QFile settings (".sbsettings");
     if ( settings.open ( QIODevice::WriteOnly ) == false ) {
         std::cerr << "Cannot open settings" << std::endl;
+        QMessageBox::critical(NULL, "Error", "Cannot open settings file");
         exit(1);
     }
     QDataStream stngs (&settings);
@@ -61,6 +63,7 @@ void Database::loadData() {
     }
     if ( settings.open ( QIODevice::ReadOnly ) == false ) {
         std::cerr << "Cannot open settings" << std::endl;
+        QMessageBox::critical(NULL, "Error", "Cannot open settings file");
         exit(1);
     }
     QDataStream stngs (&settings);

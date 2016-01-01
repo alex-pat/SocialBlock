@@ -14,11 +14,11 @@ int main(int argc, char *argv[])
     QApplication::setQuitOnLastWindowClosed(false);
 
     QQmlApplicationEngine engine;
+
     while ( isRestart == true ) {
-    engine.load(QUrl(QStringLiteral("qrc:/mainwindow.qml")));
-
-
+        engine.load(QUrl(QStringLiteral("qrc:/mainwindow.qml")));
         a.exec();
-}
+    }
+
     return 0;
 }

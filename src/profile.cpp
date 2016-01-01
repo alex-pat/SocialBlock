@@ -1,6 +1,7 @@
 #include "profile.h"
 #include "os_dependent.h"
 #include <QFile>
+#include <QMessageBox>
 #include <iostream>
 
 Profile::Profile() :
@@ -39,6 +40,7 @@ void Profile::writeToHosts() {
                      QIODevice::Text |
                      QIODevice::Append ) == false ) {
         std::cerr << "Cannot open hosts file" << std::endl;
+        QMessageBox::critical(NULL, "Error", "Cannot open hosts file, try open app with admin permissions");
         exit(1);
     }
 
@@ -66,7 +68,7 @@ void Profile::writeToHosts() {
 }
 
 void Profile::removeFromHosts( bool isNow ) {
-    QFile hosts ("HOSTS");
+    QFile hosts (HOSTS);
     if ( hosts.exists() == false )
         return;
 
@@ -82,10 +84,10 @@ void Profile::removeFromHosts( bool isNow ) {
     if ( intervIter.hasNext() == false )
         return;
 
-
     if ( hosts.open( QIODevice::ReadWrite |
                      QIODevice::Text ) == false ) {
         std::cerr << "Cannot open hosts file" << std::endl;
+        QMessageBox::critical(NULL, "Error", "Cannot open hosts file, try open app with admin permissions");
         return;
     }
 

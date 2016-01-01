@@ -34,6 +34,8 @@ ApplicationWindow {
         onOpenApplication: window.show()
     }
 
+    property int currentProf: manager.getCurrentProfileNumber()
+
     property int selectedProf: manager.getCurrentProfileNumber()
 
     property int selectedDay: {
@@ -61,50 +63,37 @@ ApplicationWindow {
                 onTriggered: manager.trackTriggered();
                 enabled: !manager.isblocked
             },
-
             Action {
                 iconName: "content/save"
                 name: "Save"
                 onTriggered: manager.save()
             },
-
             Action {
                 iconName: "action/assignment_turned_in"
                 name: "Set as current profile"
-                enabled: selectedProf !== manager.getCurrentProfileNumber() && !manager.isblocked
+                enabled: selectedProf !== currentProf && !manager.isblocked
                 onTriggered: {
                     manager.setCurrentProfileNumber(selectedProf)
-                    enabled = false
+                    currentProf = selectedProf
                 }
             },
-
             Action {
                 iconName: "awesome/user_plus"
                 name: "Add profile"
                 enabled: !manager.istracked
                 onTriggered: addProfDialog.show();
             },
-
             Action {
                 iconName: "awesome/user_times"
                 name: "Delete profile"
                 enabled: !manager.istracked
                 onTriggered: manager.deleteProfile( selectedProf );
             },
-
-            Action {
-                iconName: "action/alarm_add"
-                name: "Add time interval"
-                enabled: !manager.istracked
-                onTriggered: addIntervalDialog.show()
-            },
-
             Action {
                 iconName: "awesome/angellist"
                 name: "About"
                 onTriggered: about.show()
             },
-
             Action {
                 iconName: "awesome/power_off"
                 name: "Exit"
@@ -205,6 +194,17 @@ ApplicationWindow {
                         Scrollbar {
                             flickableItem: interFl
                         }
+                        ActionButton {
+                            anchors {
+                                right: parent.right
+                                bottom: parent.bottom
+                                margins: 32
+                            }
+                            iconName: "action/alarm_add"
+                            iconColor: !manager.istracked ? "white" : "#A0A0A0"
+                            enabled: !manager.istracked
+                            onClicked: addIntervalDialog.show()
+                        }
                     }
                 }
             }
@@ -278,7 +278,6 @@ ApplicationWindow {
             width: 2
             opacity: 1
         }
-
         Label {
             id: sitesLabel
                 text: "<b>Sites:<\b>"
@@ -348,7 +347,7 @@ ApplicationWindow {
            x: 0
            y: 70
            width: parent.width
-           height: 150
+           height: 168
            visible: true
            Flickable {
                id: flAddProf

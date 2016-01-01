@@ -99,6 +99,7 @@ void Manager::trackTriggered() {
         timer->start( 60*1000 );
         timeout();
     }
+    iconMenu->actions()[1]->setEnabled(istracked);
     istracked = !istracked;
     emit istrackedChanged();
 }
